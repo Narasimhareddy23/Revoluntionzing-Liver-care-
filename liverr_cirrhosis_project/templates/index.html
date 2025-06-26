@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Liver Cirrhosis Prediction</title>
+
+<style>
+  /* Make body and html fill entire screen with no margin */
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #f6f4f4;
+  }
+
+  /* Container fills entire viewport */
+  .container {
+    display: flex;
+    height: 100vh;           /* Full viewport height */
+    width: 100vw;            /* Full viewport width */
+    background: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+
+  /* Left side - images, takes 50% width */
+  .image-side {
+    flex: 1 1 50%;
+    background: #0288d1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 40px;
+  }
+
+  .image-side img {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  }
+
+  /* Right side - form, takes 50% width */
+  .form-side {
+    flex: 1 1 50%;
+    padding: 60px 80px;
+    overflow-y: auto;
+  }
+
+  h2 {
+    text-align: center;
+    color: #01579b;
+    margin-bottom: 40px;
+  }
+
+  form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px 30px;
+  }
+
+  label {
+    font-weight: 600;
+    color: #333;
+  }
+
+  input[type="number"] {
+    padding: 12px;
+    border: 2px solid #090909;
+    border-radius: 12px;
+    font-size: 1rem;
+    background: #a7eae9;
+    transition: border-color 0.3s ease;
+  }
+
+  input[type="number"]:focus {
+    border-color: #0288d1;
+    background: #e0f7fa;
+    outline: none;
+  }
+
+  input[type="submit"] {
+    grid-column: 1 / -1;
+    padding: 16px;
+    background: #0288d1;
+    color: rgb(252, 252, 250);
+    font-weight: 700;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  input[type="submit"]:hover {
+    background: #121212;
+  }
+
+  .result {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-top: 25px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .result.success {
+    background-color: #d0f5d8;
+    color: #256029;
+  }
+
+  .result.danger {
+    background-color: #ffe0e0;
+    color: #a71d2a;
+  }
+
+  .speak-btn {
+    margin-left: 12px;
+    background: #0288d1;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+
+  /* Responsive: stack vertically on small screens */
+  @media (max-width: 900px) {
+    .container {
+      flex-direction: column;
+    }
+    .image-side, .form-side {
+      flex: 1 1 auto;
+      width: 100%;
+      padding: 30px;
+    }
+    .image-side img {
+      max-width: 180px;
+    }
+    form {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  function speak(text) {
+    const msg = new SpeechSynthesisUtterance(text);
+    window.speechSynthesis.speak(msg);
+  }
+</script>
+</head>
+<body>
+  <div class="container">
+    <div class="image-side">
+      <img src="{{ url_for('static', filename='images/liver.png') }}" alt="Liver Image" />
+      <img src="{{ url_for('static', filename='images/liver_diagram.png') }}" alt="Liver Diagram" />
+    </div>
+
+    <div class="form-side" style="background-color:rgb(156, 252, 252);">
+      <h2>Liver Cirrhosis Prediction</h2>
+      <form method="POST" action="/predict">
+        <label for="age">👤 Age:</label>
+        <input type="number" name="age" step="any" required />
+
+        <label for="bilirubin">💧 Bilirubin:</label>
+        <input type="number" name="bilirubin" step="any" required />
+
+        <label for="alk_phosphate">🧪 Alkaline Phosphate:</label>
+        <input type="number" name="alk_phosphate" step="any" required />
+
+        <label for="sgpt">🧫 SGPT:</label>
+        <input type="number" name="sgpt" step="any" required />
+
+        <label for="sgot">🧬 SGOT:</label>
+        <input type="number" name="sgot" step="any" required />
+
+        <label for="proteins">🧬 Proteins:</label>
+        <input type="number" name="proteins" step="any" required />
+
+        <label for="albumin">⚛️ Albumin:</label>
+        <input type="number" name="albumin" step="any" required />
+
+        <label for="ag_ratio">⚖️ A/G Ratio:</label>
+        <input type="number" name="ag_ratio" step="any" required />
+
+        <input type="submit" value="Predict" />
+
+        {% if prediction_text %}
+          <div class="result {{ risk_class }}">
+            {{ prediction_text }}
+            <button onclick="speak('{{ prediction_text }}')" class="speak-btn">🔊 Speak</button>
+          </div>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+</body>
+</html>
